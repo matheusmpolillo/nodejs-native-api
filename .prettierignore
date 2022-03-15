@@ -1,0 +1,11 @@
+# VS Code
+.vscode
+
+# Node
+node_modules
+
+# Docs
+README.md
+
+# Environment
+.env
