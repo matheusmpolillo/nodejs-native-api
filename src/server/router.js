@@ -1,13 +1,16 @@
-export default class Router {
-    #request
-    #response
-    #serverTimestamp
-    #defaultResponses
+/* Modules */
+import {
+    handleGet,
+    handlePost,
+    handlePut,
+    handleDelete
+} from './controller/team.controller.js'
 
-    constructor(request, response, serverTimestamp) {
-        this.#request          = request
-        this.#response         = response
-        this.#serverTimestamp  = serverTimestamp
+export default class Router {
+    #defaultResponses
+    #serverTimestamp
+
+    constructor() {
         this.#defaultResponses = new Map()
             .set(
                 405,
@@ -23,23 +26,15 @@ export default class Router {
                     .set('contentType', 'text/plain')
                     .set('content', 'Not found')
             )
-
-        this.#routes()
     }
 
-    #routes() {
-        const url    = this.#request.url
-        const method = this.#request.method
-
-        const routingMap = this.#checkAndRouting(url, method)
-
-        this.#response.writeHead(routingMap.get('status'), {
-            'Content-Type': routingMap.get('contentType')
-        })
-
-        return this.#response.end(routingMap.get('content'))
-    }
-
+    /**
+     * Function responsible for checking url and method, and then forwarding to the correct controller.
+     *
+     * @param {string} url Request url.
+     * @param {string} method Request method.
+     * @returns {Map} Response.
+     */
     #checkAndRouting(url, method) {
         switch (url) {
             case '/ping':
@@ -64,8 +59,43 @@ export default class Router {
                     .set('status', 200)
                     .set('contentType', 'text/plain')
                     .set('content', 'v1.0.0')
+            case '/v1/team':
+                const index = ['GET', 'POST', 'PUT', 'DELETE'].indexOf(method)
+                if (index < 0) return this.#defaultResponses.get(405)
+                switch (index) {
+                    case 0:
+                        return handleGet()
+                    case 1:
+                        return handlePost()
+                    case 2:
+                        return handlePut()
+                    case 3:
+                        return handleDelete()
+                }
             default:
                 return this.#defaultResponses.get(404)
         }
+    }
+
+    /**
+     * Function responsible to create the server routes.
+     *
+     * @param {IncomingMessage} request Server request.
+     * @param {ServerResponse} response Server response.
+     * @param {number} serverTimestamp Server startup timestamp.
+     * @returns {ServerResponse} Response.
+     */
+    routes(request, response, serverTimestamp) {
+        if (!this.#serverTimestamp) this.#serverTimestamp = serverTimestamp
+        const url    = request.url
+        const method = request.method
+
+        const routingMap = this.#checkAndRouting(url, method)
+
+        response.writeHead(routingMap.get('status'), {
+            'Content-Type': routingMap.get('contentType')
+        })
+
+        return response.end(routingMap.get('content'))
     }
 }

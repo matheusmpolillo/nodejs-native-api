@@ -11,6 +11,7 @@ export default class Server {
     #port
     #serverTimestamp
     #sockets
+    #router
     #instance
 
     constructor(host, port) {
@@ -18,12 +19,17 @@ export default class Server {
         this.#port            = port
         this.#serverTimestamp = Date.now()
         this.#sockets         = new Map()
-        this.#instance        = createServer(
-            (request, response) =>
-                new Router(request, response, this.#serverTimestamp)
+        this.#router          = new Router()
+        this.#instance        = createServer((request, response) =>
+            this.#router.routes(request, response, this.#serverTimestamp)
         )
     }
 
+    /**
+     * Function responsible for start the server to the host and port informed in the class's constructor.
+     *
+     * @returns {Promise}
+     */
     async listen() {
         return new Promise((resolve, reject) => {
             this.#instance.listen(this.#port, this.#host)
@@ -52,14 +58,20 @@ export default class Server {
         })
     }
 
+    /**
+     * Function responsible for close the server.
+     */
     async close() {
-        this.#instance.close(() => {
-            log('info', 'http', 'Server closed!')
+        return new Promise((resolve, reject) => {
+            this.#instance.close(() => {
+                log('info', 'http', 'Server closed')
+            })
+            for (let socketId of this.#sockets.keys()) {
+                log('info', 'http', `Socket ${socketId} destroyed`)
+                let socket = this.#sockets.get(socketId)
+                if (socket) socket.destroy()
+            }
+            resolve()
         })
-        for (let socketId of this.#sockets.keys()) {
-            log('info', 'http', `Socket ${socketId} destroyed`)
-            let socket = this.#sockets.get(socketId)
-            if (socket) this.#sockets.get(socketId).destroy()
-        }
     }
 }
