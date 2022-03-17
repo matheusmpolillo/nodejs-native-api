@@ -8,8 +8,7 @@
         "dev": "node src/main.js",
         "dev:liveReload": "nodemon src/main.js",
         "lint": "eslint --fix --ext js .",
-        "test": "set NODE_OPTIONS='--experimental-vm-modules --no-warnings' && jest --verbose",
-        "test:cov": "set NODE_OPTIONS='--experimental-vm-modules --no-warnings' && jest --verbose --coverage && .\\coverage\\lcov-report\\index.html"
+        "test": "set NODE_OPTIONS=--experimental-vm-modules && jest --verbose"
     },
     "devDependencies": {
         "eslint": "^8.11.0",
