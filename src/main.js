@@ -7,7 +7,16 @@ import handleSignal from './utils/graceful-shutdown.js'
  */
 ;(async () => {
     const server = new Server('0.0.0.0', '3000')
-    handleSignal(['SIGINT', 'SIGTERM'], server)
+    handleSignal(
+        [
+            'SIGINT',
+            'SIGTERM',
+            'SIGHUP',
+            'uncaughtException',
+            'unhandledRejection'
+        ],
+        server
+    )
 
     await server.listen()
 })()

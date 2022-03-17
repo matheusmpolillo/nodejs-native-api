@@ -5,8 +5,8 @@
     "type": "module",
     "author": "Matheus Marques Polillo<matheus_polillo@yahoo.com>",
     "scripts": {
-        "start": "node src/main.js",
-        "dev": "nodemon src/main.js",
+        "dev": "node src/main.js",
+        "dev:liveReload": "nodemon src/main.js",
         "lint": "eslint --fix --ext js .",
         "test": "set NODE_OPTIONS='--experimental-vm-modules --no-warnings' && jest --verbose",
         "test:cov": "set NODE_OPTIONS='--experimental-vm-modules --no-warnings' && jest --verbose --coverage && .\\coverage\\lcov-report\\index.html"
@@ -19,7 +19,18 @@
         "eslint-plugin-prettier": "^4.0.0",
         "jest": "^27.5.1",
         "nodemon": "^2.0.15",
-        "prettier": "^2.5.1"
+        "prettier": "^2.5.1",
+        "supertest": "^6.2.2"
+    },
+    "nodemonConfig": {
+        "verbose": true,
+        "ignore": [
+            ".docker/*",
+            ".insomnia/*",
+            ".vscode/*",
+            "node_modules/*",
+            "test/*"
+        ]
     },
     "jest": {
         "coverageProvider": "v8",
